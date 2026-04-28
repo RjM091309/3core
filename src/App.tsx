@@ -47,6 +47,61 @@ const OFFICE_MAP_LNG = 120.5243076;
 
 const OFFICE_MAP_EMBED_URL = `https://www.google.com/maps?q=${OFFICE_MAP_LAT},${OFFICE_MAP_LNG}&z=18&output=embed`;
 
+const SITE_URL = 'https://3core21.com';
+
+type SeoEntry = {
+  title: string;
+  description: string;
+  path: string;
+};
+
+const SEO_BY_PATH: Record<string, SeoEntry> = {
+  '/': {
+    title: '3CORE LeadersTech | Integrated IT Solutions',
+    description:
+      'Trusted partner for integrated IT solutions: Network Infrastructure, Software Ecosystems, and IoT & Edge Computing.',
+    path: '/',
+  },
+  '/solutions/infrastructure': {
+    title: 'Network Infrastructure | 3CORE LeadersTech',
+    description:
+      'Enterprise-grade network infrastructure for high-performance connectivity, security, and scalable operations.',
+    path: '/solutions/infrastructure',
+  },
+  '/solutions/software': {
+    title: 'Software Ecosystems | 3CORE LeadersTech',
+    description:
+      'Custom software ecosystems, ERP and CRM platforms, and intelligent automation tailored to business needs.',
+    path: '/solutions/software',
+  },
+  '/solutions/iot': {
+    title: 'IoT & Edge Computing | 3CORE LeadersTech',
+    description:
+      'IoT and edge computing solutions for real-time insights, predictive maintenance, and secure endpoint operations.',
+    path: '/solutions/iot',
+  },
+  '/our-story': {
+    title: 'Our Story | 3CORE LeadersTech',
+    description:
+      'Learn the story of 3CORE LeadersTech and how we deliver reliable, end-to-end integrated IT solutions.',
+    path: '/our-story',
+  },
+};
+
+const setMetaContent = (selector: string, content: string) => {
+  const el = document.head.querySelector(selector);
+  if (el) {
+    el.setAttribute('content', content);
+  }
+};
+
+const setCanonicalUrl = (url: string) => {
+  const canonical = document.head.querySelector('link[rel="canonical"]');
+  if (canonical) {
+    canonical.setAttribute('href', url);
+  }
+};
+
 interface FAQItemProps {
   question: string;
   answer: string;
@@ -60,6 +115,29 @@ const ScrollToTop = () => {
       window.scrollTo(0, 0);
     }
   }, [pathname]);
+  return null;
+};
+
+const RouteSeoManager = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const seo = SEO_BY_PATH[location.pathname] ?? SEO_BY_PATH['/'];
+    const canonicalUrl = `${SITE_URL}${seo.path}`;
+
+    document.title = seo.title;
+    setMetaContent('meta[name="description"]', seo.description);
+
+    setMetaContent('meta[property="og:title"]', seo.title);
+    setMetaContent('meta[property="og:description"]', seo.description);
+    setMetaContent('meta[property="og:url"]', canonicalUrl);
+
+    setMetaContent('meta[name="twitter:title"]', seo.title);
+    setMetaContent('meta[name="twitter:description"]', seo.description);
+
+    setCanonicalUrl(canonicalUrl);
+  }, [location.pathname]);
+
   return null;
 };
 
@@ -678,13 +756,13 @@ const Home = () => {
                     <label className="block text-xs font-semibold tracking-wider uppercase text-slate-400 mb-2.5">
                       Full Name
                     </label>
-                    <input type="text" className="w-full bg-white/[0.06] rounded-2xl px-5 py-4 outline-none transition-all text-white placeholder:text-slate-500 ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500/40 focus:bg-white/[0.08]" placeholder="John Doe" />
+                    <input type="text" className="w-full bg-white/[0.06] rounded-2xl px-5 py-4 outline-none transition-all text-white placeholder:text-slate-500 ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500/40 focus:bg-white/[0.08]" placeholder="Your Name" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold tracking-wider uppercase text-slate-400 mb-2.5">
                       Work Email
                     </label>
-                    <input type="email" className="w-full bg-white/[0.06] rounded-2xl px-5 py-4 outline-none transition-all text-white placeholder:text-slate-500 ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500/40 focus:bg-white/[0.08]" placeholder="john@company.com" />
+                    <input type="email" className="w-full bg-white/[0.06] rounded-2xl px-5 py-4 outline-none transition-all text-white placeholder:text-slate-500 ring-1 ring-white/10 focus:ring-2 focus:ring-indigo-500/40 focus:bg-white/[0.08]" placeholder="you@company.com" />
                   </div>
                 </div>
                 <div>
@@ -897,6 +975,7 @@ export default function App() {
   return (
     <Router>
       <ScrollToTop />
+      <RouteSeoManager />
       <HashScrollAfterRoute />
       <div className="min-h-screen selection:bg-indigo-100 selection:text-indigo-700">
         <Navbar />
